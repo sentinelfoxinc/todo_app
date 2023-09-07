@@ -11,12 +11,12 @@
 		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js" crossorigin="anonymous"></script>
 		<script>
-			console.log(window.location.host);
+			console.log(window.location.protocol + '//' + window.location.hostname + ':4040/api');
 			const api = axios.create({
 				headers: {
 					'Access-Control-Allow-Origin': '*',
 				},
-				baseURL: window.location.host + '/api',
+				baseURL: window.location.protocol + '//' + window.location.hostname + ':4040/api',
 			});
 		</script>
 	</head>

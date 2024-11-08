@@ -7,6 +7,9 @@ services:
       - 4040:4040
     environment:
       - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=todo
       - PORT=3030
     depends_on:
       mysql: 

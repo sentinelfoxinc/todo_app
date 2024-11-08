@@ -14,8 +14,10 @@ api.use(cors({origin: true}));
 app.set('view engine', 'ejs');
 app.use(express.static('views'));
 
+const API_URL = process.env.API_URL || `http://localhost:${API_PORT}`;
+
 app.get('/', async (req, res) => {
-	res.render('index', {url: `http://localhost:${API_PORT}`});
+	res.render('index', {url: API_URL});
 });
 
 api.get('/api/list', async (req, res) => {
@@ -190,7 +192,7 @@ api.post('/api/remove-assign', async (req, res) => {
 	}
 });
 
-const PORT = process.env.PORT || 3031;
+const PORT = process.env.PORT || 3030;
 app.listen(PORT, () => console.log(`App Server running at http://localhost:${PORT}`));
 
 const API_PORT = process.env.API_PORT || 4040;

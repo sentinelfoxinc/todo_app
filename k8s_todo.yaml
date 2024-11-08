@@ -1,0 +1,169 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: todo-app
+  name: todo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      containers:
+      - image: alpha260/todo:v4
+        name: todo-app
+        env:
+        - name: API_URL
+          value: http://api.alphonsa.todo
+        - name: MYSQL_HOST
+          value: mysql.default.svc.cluster.local
+        - name: MYSQL_USER
+          value: root
+        - name: MYSQL_PASSWORD
+          value: passowrd
+        - name: MYSQL_DATABASE
+          value: todo
+        ports:
+        - containerPort: 3030
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: todo-api
+  name: todo-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-api
+  template:
+    metadata:
+      labels:
+        app: todo-api
+    spec:
+      containers:
+      - image: alpha260/todo:v4
+        name: todo-api
+        ports:
+        - containerPort: 4040
+        env:
+        - name: API_URL
+          value: http://api.alphonsa.todo
+        - name: MYSQL_HOST
+          value: mysql.default.svc.cluster.local
+        - name: MYSQL_USER
+          value: root
+        - name: MYSQL_PASSWORD
+          value: passowrd
+        - name: MYSQL_DATABASE
+          value: todo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-app
+spec:
+  selector:
+    app: todo-app
+  ports:
+    - protocol: TCP
+      port: 3030
+      targetPort: 3030
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-api
+spec:
+  selector:
+    app: todo-api
+  ports:
+    - protocol: TCP
+      port: 4040
+      targetPort: 4040
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: "mysql"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: mysql
+        image: mysql
+        ports:
+        - containerPort: 3306
+          name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: passowrd
+        - name: MYSQL_DATABASE
+          value: todo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  clusterIP: "None"
+  selector:
+    app: mysql
+  ports:
+    - name: mysql
+      port: 3306
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: todo-app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host:  app.alphonsa.todo
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: todo-app
+            port:
+              number: 3030
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: todo-api-ingress
+  # annotations:
+    # nginx.ingress.kubernetes.io/rewrite-target: /api/$1
+spec:
+  rules:
+  - host:  api.alphonsa.todo
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: todo-api
+            port:
+              number: 4040

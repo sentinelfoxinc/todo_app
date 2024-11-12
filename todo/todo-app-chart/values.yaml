@@ -1,0 +1,42 @@
+# Global values for the Helm chart
+global:
+  apiUrl: "http://api.alphonsa.todo"
+
+# Configuration for the todo-app Deployment
+todoApp:
+  name: "todo-app"
+  replicas: 1
+  image: "alpha260/todo:v4"
+  env:
+    API_URL: "http://api.alphonsa.todo"
+  service:
+    port: 3030
+  ingress:
+    enabled: true
+    host: "app.alphonsa.todo"
+
+# Configuration for the todo-api Deployment
+todoApi:
+  name: "todo-api"
+  replicas: 1
+  image: "alpha260/todo:v4"
+  service:
+    port: 4040
+  ingress:
+    enabled: true
+    host: "api.alphonsa.todo"
+  env:
+    API_URL: "http://api.alphonsa.todo"
+
+# MySQL configuration
+mysql:
+  name: "mysql"
+  image: "mysql"
+  replicas: 1
+  rootPassword: "password"
+  database: "todo"
+  host: "mysql.default.svc.cluster.local"
+  user: "root"
+  service:
+    port: 3306
+

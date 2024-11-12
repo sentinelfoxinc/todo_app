@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.todoApi.name }}
+  name: {{ .Values.todoApi.name }}
+spec:
+  replicas: {{ .Values.todoApi.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.todoApi.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.todoApi.name }}
+    spec:
+      containers:
+      - image: {{ .Values.todoApi.image }}
+        name: {{ .Values.todoApi.name }}
+        ports:
+        - containerPort: {{ .Values.todoApi.service.port }}
+        env:
+        - name: API_URL
+          value: {{ .Values.todoApi.env.API_URL }}
+        - name: MYSQL_HOST
+          value: {{ .Values.mysql.host }} 
+        - name: MYSQL_USER
+          value: {{ .Values.mysql.user }}
+        - name: MYSQL_PASSWORD
+          value: {{ .Values.mysql.rootPassword }}
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mysql.database }} 

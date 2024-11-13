@@ -33,7 +33,7 @@ mysql:
   name: "mysql"
   image: "mysql"
   replicas: 1
-  rootPassword: "password"
+  rootPassword: "passwrd"
   database: "todo"
   host: "mysql.default.svc.cluster.local"
   user: "root"

@@ -22,7 +22,7 @@ spec:
         - name: API_URL
           value: {{ .Values.todoApp.env.API_URL }}
         - name: MYSQL_HOST
-          value: {{ .Values.mysql.host | quote }}
+          value: "mysql.{{ .Release.Namespace }}.svc.cluster.local"
         - name: MYSQL_USER
           value: {{ .Values.mysql.user }}
         - name: MYSQL_PASSWORD

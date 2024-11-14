@@ -4,6 +4,7 @@ metadata:
   labels:
     app: {{ .Values.todoApp.name }}
   name: {{ .Values.todoApp.name }}
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.todoApp.replicas }}
   selector:

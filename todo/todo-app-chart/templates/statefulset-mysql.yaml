@@ -25,4 +25,11 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           value: {{ .Values.mysql.rootPassword }}
         - name: MYSQL_DATABASE
-          value: {{ .Values.mysql.database }} 
+          value: {{ .Values.mysql.database }}
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m" 

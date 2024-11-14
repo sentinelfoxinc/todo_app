@@ -31,7 +31,7 @@ todoApi:
 # MySQL configuration
 mysql:
   name: "mysql"
-  image: "mysql"
+  image: "mysql:8.0"
   replicas: 1
   rootPassword: "passwrd"
   database: "todo"

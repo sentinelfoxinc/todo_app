@@ -35,7 +35,7 @@ mysql:
   replicas: 1
   rootPassword: "passwrd"
   database: "todo"
-  host: "mysql.default.svc.cluster.local"
+  host: "mysql.{{ .Release.Namespace }}.svc.cluster.local"
   user: "root"
   service:
     port: 3306

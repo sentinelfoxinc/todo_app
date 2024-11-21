@@ -333,6 +333,3 @@ spec:
 
 ## 7. Access the Application
 To access your application to local test using ``` minikube tunnel ``` or you can use ip in browser.
-
-
-

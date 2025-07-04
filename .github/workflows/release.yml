@@ -3,7 +3,7 @@ name: Release Drafter
 on:
   push:
     branches:
-      - main
+      - release
   # This is for autolabeler
   pull_request:
     types: [opened, reopened, synchronize]
@@ -29,4 +29,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          commitish: main
+          commitish: release

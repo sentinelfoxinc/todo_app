@@ -15,5 +15,6 @@ RUN npm install
 RUN npm install pm2 -g
 
 COPY --chown=node:node ./start.sh /app/start.sh
+
 RUN chmod +x ./start.sh
 CMD ./start.sh

@@ -1,3 +1,4 @@
+//const newrelic = require('newrelic')
 const express = require('express');
 const bodyParser = require('body-parser');
 var knex = require('./db/connection');
@@ -9,13 +10,16 @@ const api = express();
 api.use(bodyParser.urlencoded({extended: true}));
 api.use(bodyParser.json());
 api.use(cors({origin: true}));
-app.use(express.static('public'));
+app.set('view engine', 'ejs');
+app.use(express.static('views'));
+
+const API_URL = process.env.API_URL || `http://localhost:${API_PORT}`;
 
 app.get('/', async (req, res) => {
-	res.sendFile(__dirname + '/public/index.html');
+	res.render('index', {url: API_URL});
 });
 
-api.get('/list', async (req, res) => {
+api.get('/api/list', async (req, res) => {
 	try {
 		let _tasks = [];
 		_tasks =
@@ -45,7 +49,7 @@ api.get('/list', async (req, res) => {
 	}
 });
 
-api.post('/add', async (req, res) => {
+api.post('/api/add', async (req, res) => {
 	try {
 		let data = await knex('tasks').insert({...req.body, is_completed: false});
 		res.json({
@@ -61,7 +65,7 @@ api.post('/add', async (req, res) => {
 	}
 });
 
-api.post('/done', async (req, res) => {
+api.post('/api/done', async (req, res) => {
 	try {
 		await knex('tasks')
 			.where('id', req.query.id)
@@ -78,7 +82,7 @@ api.post('/done', async (req, res) => {
 	}
 });
 
-api.delete('/clear-all', async (req, res) => {
+api.delete('/api/clear-all', async (req, res) => {
 	await knex('assignees').truncate();
 	await knex('tasks').truncate();
 	try {
@@ -94,7 +98,7 @@ api.delete('/clear-all', async (req, res) => {
 	}
 });
 
-api.delete('/delete', async (req, res) => {
+api.delete('/api/delete', async (req, res) => {
 	try {
 		await knex('assignees').where('task_id', req.query.id).del();
 		await knex('tasks').where('id', req.query.id).del();
@@ -110,7 +114,7 @@ api.delete('/delete', async (req, res) => {
 	}
 });
 
-api.post('/users/add', async (req, res) => {
+api.post('/api/users/add', async (req, res) => {
 	try {
 		await knex('users').insert({...req.body});
 		res.json({
@@ -125,7 +129,7 @@ api.post('/users/add', async (req, res) => {
 	}
 });
 
-api.get('/users/list', async (req, res) => {
+api.get('/api/users/list', async (req, res) => {
 	try {
 		let _users = await knex.select().table('users');
 		res.json({
@@ -140,7 +144,7 @@ api.get('/users/list', async (req, res) => {
 	}
 });
 
-api.delete('/users/delete', async (req, res) => {
+api.delete('/api/users/delete', async (req, res) => {
 	try {
 		await knex('assignees').where('user_id', req.query.id).del();
 		await knex('users').where('id', req.query.id).del();
@@ -156,7 +160,7 @@ api.delete('/users/delete', async (req, res) => {
 	}
 });
 
-api.post('/assign-to', async (req, res) => {
+api.post('/api/assign-to', async (req, res) => {
 	try {
 		await knex('assignees').insert({user_id: req.query.user, task_id: req.query.task});
 		res.json({
@@ -172,7 +176,7 @@ api.post('/assign-to', async (req, res) => {
 	}
 });
 
-api.post('/remove-assign', async (req, res) => {
+api.post('/api/remove-assign', async (req, res) => {
 	try {
 		await knex('assignees').where('user_id', req.query.user).where('task_id', req.query.task).del();
 		res.json({
@@ -187,7 +191,7 @@ api.post('/remove-assign', async (req, res) => {
 	}
 });
 
-const PORT = process.env.PORT || 3031;
+const PORT = process.env.PORT || 3030;
 app.listen(PORT, () => console.log(`App Server running at http://localhost:${PORT}`));
 
 const API_PORT = process.env.API_PORT || 4040;

@@ -8,11 +8,12 @@ require('dotenv').config({
 module.exports = {
 	client: 'mysql2',
 	connection: {
-		host: process.env.MYSQL_HOST || 'localhost',
+		host: process.env.MYSQL_HOST || 'todo.mysql.database.azure.com',
 		port: process.env.MYSQL_PORT || 3306,
-		user: process.env.MYSQL_USER || 'root',
-		password: process.env.MYSQL_PASSWORD || 'password',
+		user: process.env.MYSQL_USER || 'todo',
+		password: process.env.MYSQL_PASSWORD || 'xxxxxxxxx',
 		database: process.env.MYSQL_DATABASE || 'todo',
+		ssl: { rejectUnauthorized: false }
 	},
 	useNullAsDefault: true,
 	migrations: {

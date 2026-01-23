@@ -5,7 +5,7 @@ metadata:
 spec:
   entrypoint: hello-world
   templates:
-    - name: hello-world
+    - name: hello-world-1
       container:
         image: busybox
         command: [ echo ]

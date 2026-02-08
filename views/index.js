@@ -1,10 +1,3 @@
-const api = axios.create({
-	headers: {
-		'Access-Control-Allow-Origin': '*',
-	},
-	baseURL: 'http://localhost:4040',
-});
-
 const ToDo = ({task, onDelete, onComplete, isCompleted, viewUsers, users, removerUser}) => {
 	return (
 		<li class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">

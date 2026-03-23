@@ -1,7 +1,7 @@
 
 def GIT_ORG_NAME = params.GIT_ORG_NAME
 def PROJECT_GIT_REPO = params.PROJECT_GIT_REPO
-def BRANCH = 'docker'
+def BRANCH = 'main'
 def GIT_URI = "git@github.com:${GIT_ORG_NAME}/${PROJECT_GIT_REPO}.git"
 
 def AWS_REGION = 'ap-south-1'

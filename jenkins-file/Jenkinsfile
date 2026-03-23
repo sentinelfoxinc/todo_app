@@ -1,0 +1,145 @@
+
+def GIT_ORG_NAME = params.GIT_ORG_NAME
+def PROJECT_GIT_REPO = params.PROJECT_GIT_REPO
+def BRANCH = 'docker'
+def GIT_URI = "git@github.com:${GIT_ORG_NAME}/${PROJECT_GIT_REPO}.git"
+
+def AWS_REGION = 'ap-south-1'
+def ECR_REPO_URL = "009654692619.dkr.ecr.${AWS_REGION}.amazonaws.com"
+def ECR_REPO_NAME = 'versioning-tag'
+
+def ENV = 'stg'
+def CHART_REPO_BRANCH = 'main'
+def DEPLOY_VALUE_FILE = "k8s_todo.yaml"
+
+
+pipeline {
+  agent any
+
+  tools {
+    maven 'Maven 3.9.11'
+  }
+
+  stages {
+    stage('Clone the Code') {
+      steps {
+        echo "=================================================="
+        echo "Branch: ${BRANCH}"
+        echo "ECR Repo: ${ECR_REPO_URL}/${ECR_REPO_NAME}"
+        echo "=================================================="
+
+        withCredentials([usernamePassword(
+          credentialsId: 'github',
+          usernameVariable: 'GIT_USER',
+          passwordVariable: 'GIT_PAT'
+        )]) {
+
+          script {
+            sh """
+              set -e
+
+              cat <<EOF > ~/.netrc
+machine github.com
+login $GIT_USER
+password $GIT_PAT
+EOF
+              chmod 600 ~/.netrc
+
+              rm -rf ${PROJECT_GIT_REPO}_build || true
+              mkdir ${PROJECT_GIT_REPO}_build
+              cd ${PROJECT_GIT_REPO}_build
+
+              git clone -b ${BRANCH} https://github.com/${GIT_ORG_NAME}/${PROJECT_GIT_REPO}.git
+              cd ${PROJECT_GIT_REPO}
+
+              echo "Latest commit:"
+              git log -1 --pretty=format:"%H - %an - %s (%ci)"
+
+              rm -f ~/.netrc
+            """
+          }
+        }
+      }
+    }
+
+    stage('Generate Version') {
+      steps {
+        script {
+          def version = sh(
+            script: "cd ${PROJECT_GIT_REPO}_build && git describe --tags --abbrev=0 || echo v0.0.0",
+            returnStdout: true
+          ).trim()
+
+          echo "Last version: ${version}"
+
+          def parts = version.replace("v","").split("\\.")
+          def major = parts[0].toInteger()
+          def minor = parts[1].toInteger()
+          def patch = parts[2].toInteger() + 1
+
+          env.NEW_VERSION = "v${major}.${minor}.${patch}"
+          echo "New Version: ${env.NEW_VERSION}"
+        }
+      }
+    }
+
+    stage('Login with ECR') {
+      steps {
+        script {
+          sh """
+          aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URL}
+          """
+        }
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sshagent(credentials: ['basedynamics']) {
+          script {
+            env.IMAGE_TAG = "${ECR_REPO_URL}/${ECR_REPO_NAME}:${env.NEW_VERSION}"
+            
+            sh """
+              docker buildx create --use || true
+              docker buildx inspect --bootstrap
+              docker buildx build \
+                --platform linux/amd64,linux/arm64 \
+                -t ${IMAGE_TAG} \
+                -f ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO}/Dockerfile \
+                ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO} \
+                --push
+            """
+            echo "Docker Image: ${IMAGE_TAG}"
+
+            image.push()
+            echo image.id
+            docker rmi ${image.id}
+            sh """
+              git checkout ${CHART_REPO_BRANCH} && git pull origin ${CHART_REPO_BRANCH} --no-rebase
+
+              sed -i "s/^\\(\\s*tag:\\s*\\).*/\\1${CHART_REPO_BRANCH}-${now}/" "${DEPLOY_VALUE_FILE}"
+
+              git add "${DEPLOY_VALUE_FILE}"
+              git commit -m "Latest Docker Image Tag Update: ${CHART_REPO_BRANCH}-${now}"
+              git push origin ${CHART_REPO_BRANCH}
+            """
+          }
+        }
+      }
+    }
+    stage('Tag Git Repo') {
+      steps {
+       sshagent(credentials: ['basedynamics']) {
+          sh """
+            cd ${PROJECT_GIT_REPO}_build
+
+            git tag ${NEW_VERSION}
+            git push github.com/${GIT_ORG_NAME}/${PROJECT_GIT_REPO}.git ${NEW_VERSION}
+          """
+        }
+      }
+    }
+
+
+  } 
+}

@@ -49,7 +49,7 @@ EOF
               mkdir ${PROJECT_GIT_REPO}_build
               cd ${PROJECT_GIT_REPO}_build
 
-              git clone -b ${BRANCH} https://github.com/${GIT_ORG_NAME}/${PROJECT_GIT_REPO}.git
+              git clone -b ${BRANCH} git@github.com:${GIT_ORG_NAME}/${PROJECT_GIT_REPO}.git
               cd ${PROJECT_GIT_REPO}
 
               echo "Latest commit:"

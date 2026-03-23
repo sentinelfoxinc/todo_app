@@ -121,7 +121,7 @@ EOF
 
               git add "${DEPLOY_VALUE_FILE}"
               git commit -m "Latest Docker Image Tag Update: ${IMAGE_TAG}"
-              git push origin ${CHART_REPO_BRANCH}
+              git push origin ${BRANCH}
             """
           }
         }

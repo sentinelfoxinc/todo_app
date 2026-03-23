@@ -92,14 +92,15 @@ pipeline {
       steps {
         sshagent(credentials: ['basedynamics']) {
           script {
-            env.IMAGE_TAG = "${ECR_REPO_URL}/${ECR_REPO_NAME}:${env.NEW_VERSION}"
+            def now = (new Date()).format("dd-MM-yyyy-HH-mm-ss", TimeZone.getTimeZone('UTC'))
+            def tag = "${ECR_REPO_URL}/${ECR_REPO_NAME}:${ENV}-${now}"
             
             sh """
               docker buildx create --use || true
               docker buildx inspect --bootstrap
               docker buildx build \
                 --platform linux/amd64 \
-                -t ${IMAGE_TAG} \
+                -t ${tag} \
                 -f ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO}/Dockerfile \
                 ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO} \
                 --push
@@ -112,10 +113,10 @@ pipeline {
             sh """
               cd ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO}
 
-              sed -i "s|^\\(\\s*tag:\\s*\\).*|\\1${IMAGE_TAG}|" "${DEPLOY_VALUE_FILE}"
+              sed -i "s|^\\(\\s*tag:\\s*\\).*|\\1${ENV}-${now}|" "${DEPLOY_VALUE_FILE}"
 
               git add "${DEPLOY_VALUE_FILE}"
-              git commit -m "Latest Docker Image Tag Update: ${IMAGE_TAG}"
+              git commit -m "Latest Docker Image Tag Update: ${ENV}-${now}"
               git push origin ${BRANCH}
             """
           }

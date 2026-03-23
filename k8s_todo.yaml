@@ -1,0 +1,77 @@
+# Default values for sentral.
+replicaCount: 1
+image:
+  repository: 1234567890.dkr.ecr.ap-south-1.amazonaws.com/versioning-tag
+  pullPolicy: IfNotPresent
+  tag: 009654692619.dkr.ecr.ap-south-1.amazonaws.com/versioning-tag:v0.0.1
+job:
+  repository: 1234567890.dkr.ecr.ap-south-1.amazonaws.com/versioning-tag-engine
+  pullPolicy: IfNotPresent
+  Jobtag: main-12-03-2026-12-57-49
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  automount: true
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::1234567890:role/versioning-tag-role
+  name: ""
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+service:
+  type: ClusterIP
+  port: 8080
+  grpcPort: 9090
+ingress:
+  enabled: true
+  ingressClassName: alb
+  annotations:
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    # alb.ingress.kubernetes.io/backend-protocol-version: GRPC
+    alb.ingress.kubernetes.io/group.name: "staging-lb"
+    alb.ingress.kubernetes.io/group.order: "1"
+  hosts:
+    - host: "*.krioiq.com"
+      paths:
+        - path: /accounts
+          pathType: Prefix
+  tls:
+    - hosts:
+      - "*.krioiq.com"
+resources:
+  limits:
+    cpu: "500m"
+    memory: 1Gi
+  requests:
+    cpu: "250m"
+    memory: 500Mi
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: http
+  initialDelaySeconds: 90
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+volumes: []
+volumeMounts: []
+nodeSelector: {}
+tolerations: []
+affinity: {}
+region: ap-south-1
+environment: staging

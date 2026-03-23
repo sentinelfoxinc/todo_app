@@ -115,6 +115,7 @@ EOF
             // echo image.id
             // docker rmi ${image.id}
             sh """
+              cd ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO}
               git checkout ${CHART_REPO_BRANCH} && git pull origin ${CHART_REPO_BRANCH} --no-rebase
 
               sed -i "s|^\\(\\s*tag:\\s*\\).*|\\1${IMAGE_TAG}|" "${DEPLOY_VALUE_FILE}"

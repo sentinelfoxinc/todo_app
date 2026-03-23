@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: 1234567890.dkr.ecr.ap-south-1.amazonaws.com/versioning-tag
   pullPolicy: IfNotPresent
-  tag: 009654692619.dkr.ecr.ap-south-1.amazonaws.com/versioning-tag:v0.0.6
+  tag: stg-23-03-2026-07-26-27
 job:
   repository: 1234567890.dkr.ecr.ap-south-1.amazonaws.com/versioning-tag-engine
   pullPolicy: IfNotPresent

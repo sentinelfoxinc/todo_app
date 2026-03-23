@@ -117,7 +117,7 @@ EOF
             sh """
               git checkout ${CHART_REPO_BRANCH} && git pull origin ${CHART_REPO_BRANCH} --no-rebase
 
-              sed -i "s|^\\(\\s*tag:\\s*\\).*|\\1${IMAGE_TAG}|" "${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO}/${DEPLOY_VALUE_FILE}"
+              sed -i "s|^\\(\\s*tag:\\s*\\).*|\\1${IMAGE_TAG}|" "${DEPLOY_VALUE_FILE}"
 
               git add "${DEPLOY_VALUE_FILE}"
               git commit -m "Latest Docker Image Tag Update: ${IMAGE_TAG}"

@@ -9,7 +9,7 @@ def ECR_REPO_URL = "009654692619.dkr.ecr.${AWS_REGION}.amazonaws.com"
 def ECR_REPO_NAME = 'versioning-tag'
 
 def ENV = 'stg'
-def CHART_REPO_BRANCH = 'docker'
+def CHART_REPO_BRANCH = 'main'
 def DEPLOY_VALUE_FILE = "k8s_todo.yaml"
 
 
@@ -116,7 +116,6 @@ EOF
             // docker rmi ${image.id}
             sh """
               cd ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO}
-              git checkout ${CHART_REPO_BRANCH} && git pull origin ${CHART_REPO_BRANCH} --no-rebase
 
               sed -i "s|^\\(\\s*tag:\\s*\\).*|\\1${IMAGE_TAG}|" "${DEPLOY_VALUE_FILE}"
 

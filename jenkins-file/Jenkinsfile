@@ -9,7 +9,7 @@ def ECR_REPO_URL = "009654692619.dkr.ecr.${AWS_REGION}.amazonaws.com"
 def ECR_REPO_NAME = 'versioning-tag'
 
 def ENV = 'stg'
-def CHART_REPO_BRANCH = 'main'
+def CHART_REPO_BRANCH = 'docker'
 def DEPLOY_VALUE_FILE = "k8s_todo.yaml"
 
 

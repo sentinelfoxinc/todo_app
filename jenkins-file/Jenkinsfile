@@ -109,11 +109,11 @@ EOF
                 ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO} \
                 --push
             """
-            echo "Docker Image: ${IMAGE_TAG}"
+            // echo "Docker Image: ${IMAGE_TAG}"
 
-            image.push()
-            echo image.id
-            docker rmi ${image.id}
+            // image.push()
+            // echo image.id
+            // docker rmi ${image.id}
             sh """
               git checkout ${CHART_REPO_BRANCH} && git pull origin ${CHART_REPO_BRANCH} --no-rebase
 

@@ -103,7 +103,7 @@ EOF
               docker buildx create --use || true
               docker buildx inspect --bootstrap
               docker buildx build \
-                --platform linux/amd64,linux/arm64 \
+                --platform linux/amd64 \
                 -t ${IMAGE_TAG} \
                 -f ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO}/Dockerfile \
                 ${WORKSPACE}/${PROJECT_GIT_REPO}_build/${PROJECT_GIT_REPO} \
